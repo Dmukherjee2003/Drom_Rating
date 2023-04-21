@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-8">
+        <h1>{{ dorm.name }}</h1>
+        <p>{{ dorm.description }}</p>
+        <img src="{{ dorm.image_url }}" alt="{{ dorm.name }} image" class="img-fluid">
+        <a href="{{ dorm.maps_url }}" target="_blank" class="btn btn-primary mt-2">View on Map</a>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('rate_dorm', dorm_id=dorm.id) }}" class="btn btn-secondary mt-2">Rate Dorm</a>
+        {% endif %}
+      </div>
+      <div class="col-md-4">
+        <h2>Ratings</h2>
+        <ul class="list-group">
+          {% for rating in ratings %}
+            <li class="list-group-item">
+              <p>Rating: {{ rating.rating }}</p>
+              <p>Comment: {{ rating.comment }}</p>
+              <p>By: {{ rating.user.username }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}

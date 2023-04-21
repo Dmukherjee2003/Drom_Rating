@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <h1 class="mb-4">{{ 'Update' if dorm else 'Add' }} Dorm</h1>
+        <form action="{{ url_for('add_dorm', dorm_id=dorm.id) if dorm else url_for('add_dorm') }}" method="post">
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ dorm.name if dorm }}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ dorm.description if dorm }}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="image_url">Image URL:</label>
+            <input type="url" class="form-control" id="image_url" name="image_url" value="{{ dorm.image_url if dorm }}">
+          </div>
+
+          <div class="form-group">
+            <label for="maps_url">Maps URL:</label>
+            <input type="url" class="form-control" id="maps_url" name="maps_url" value="{{ dorm.maps_url if dorm }}">
+          </div>
+
+          <button type="submit" class="btn btn-primary">{{ 'Update' if dorm else 'Add' }} Dorm</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>Your Ratings</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Dorm Name</th>
+          <th scope="col">Rating</th>
+          <th scope="col">Comment</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rating in ratings %}
+          <tr>
+            <td>{{ rating.dorm.name }}</td>
+            <td>{{ rating.rating }}</td>
+            <td>{{ rating.comment }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

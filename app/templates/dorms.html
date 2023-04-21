@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Dorms</h1>
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
+        <select class="form-control" id="sort-select">
+          <option value="rating-desc">Sort by Rating (High to Low)</option>
+          <option value="rating-asc">Sort by Rating (Low to High)</option>
+          <option value="name-asc">Sort by Name (A to Z)</option>
+          <option value="name-desc">Sort by Name (Z to A)</option>
+        </select>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add-dorm-modal">Add Dorm</button>
+      </form>
+    </div>
+</div>
+    
+    <div class="row" id="dorm-cards">
+      {% for dorm in dorms %}
+        <div class="col-md-4 dorm-card">
+          <div class="card mb-4 shadow-sm border-0">
+            <img src="{{ dorm.image_url }}" class="card-img-top" alt="{{ dorm.name }}">
+            <div class="card-body">
+              <h5 class="card-title mb-2">{{ dorm.name }}</h5>
+              <p class="card-text text-truncate">{{ dorm.description }}</p>
+              {% if dorm.average_rating %}
+                <p class="card-text mb-1">Average Rating: {{ "%.1f"|format(dorm.average_rating) }}</p>
+              {% else %}
+                <p class="card-text mb-1">No ratings available.</p>
+              {% endif %}
+              <div class="d-flex justify-content-between align-items-center mt-auto">
+                <a href="{{ url_for('dorm_page', dorm_id=dorm.id) }}" class="btn btn-primary">View Details</a>
+                {% if current_user.is_authenticated %}
+                  <a href="{{ url_for('rate_dorm', dorm_id=dorm.id) }}" class="btn btn-secondary">Rate Dorm</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Add Dorm Modal -->
+  <div class="modal fade" id="add-dorm-modal" tabindex="-1" role="dialog" aria-labelledby="add-dorm-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="add-dorm-modal-label">{{ 'Update' if dorm else 'Add' }} Dorm</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ url_for('add_dorm', dorm_id=dorm.id) if dorm else url_for('add_dorm') }}" method="post">
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" class="form-control" id="name" name="name" value="{{ dorm.name if dorm }}" required>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description:</label>
+              <textarea class="form-control" id="description" name="description" rows="3">{{ dorm.description if dorm }}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="image_url">Image URL:</label>
+          <input type="url" class="form-control" id="image_url" name="image_url" value="{{ dorm.image_url if dorm }}">
+        </div>
+
+        <div class="form-group">
+          <label for="maps_url">Maps URL:</label>
+          <input type="url" class="form-control" id="maps_url" name="maps_url" value="{{ dorm.maps_url if dorm }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{ 'Update' if dorm else 'Add' }} Dorm</button>
+      </form>
+    </div>
+  </div>
+</div>
+  </div>
+  <script>
+    const searchInput = document.getElementById('search-input');
+    const dormCards = document.querySelectorAll('.dorm-card');
+
+    searchInput.addEventListener('input', function(event) {
+      const searchQuery = event.target.value.toLowerCase();
+      dormCards.forEach(function(dormCard) {
+        const dormName = dormCard.querySelector('.card-title').textContent.toLowerCase();
+        const dormDescription = dormCard.querySelector('.card-text').textContent.toLowerCase();
+        if (dormName.includes(searchQuery) || dormDescription.includes(searchQuery)) {
+          dormCard.style.display = '';
+        } else {
+          dormCard.style.display = 'none';
+        }
+      });
+    });
+    function sortDorms(sortOrder) {
+  const dormCardsArray = Array.from(dormCards);
+  dormCardsArray.sort(function(a, b) {
+    let dormA, dormB;
+    if (sortOrder === 'rating-desc' || sortOrder === 'rating-asc') {
+      dormA = a.querySelector('.card-text.mb-1').textContent.trim().replace('Average Rating: ', '');
+      dormB = b.querySelector('.card-text.mb-1').textContent.trim().replace('Average Rating: ', '');
+    } else {
+      dormA = a.querySelector('.card-title').textContent.trim();
+      dormB = b.querySelector('.card-title').textContent.trim();
+    }
+    if (sortOrder === 'rating-desc' || sortOrder === 'name-desc') {
+      return dormB.localeCompare(dormA);
+    } else {
+      return dormA.localeCompare(dormB);
+    }
+  });
+  dormCardsArray.forEach(function(dormCard) {
+    dormCard.parentNode.removeChild(dormCard);
+    document.getElementById('dorm-cards').appendChild(dormCard);
+  });
+}
+const sortSelect = document.getElementById('sort-select');
+sortSelect.addEventListener('change', function(event) {
+  const sortOrder = event.target.value;
+  sortDorms(sortOrder);
+});
+
+  </script>
+{% endblock %}

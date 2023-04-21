@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Welcome to your Dorm Search, {{ current_user.username }}</h1>
+  
+  <!-- Featured dorms -->
+  <section>
+    <h2>Featured Dorms</h2>
+    <div class="row">
+      {% for dorm in featured_dorms %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <img src="{{ dorm.image_url }}" class="card-img-top" alt="{{ dorm.name }}" style="height: 200px; object-fit: cover;">
+          <div class="card-body">
+            <h5 class="card-title">{{ dorm.name }}</h5>
+            <p class="card-text">{{ dorm.description|truncate(100) }}</p>
+            <i class="fa-solid fa-star"></i><a href="" class="alert text-warning">{{ dorm.average_rating }}</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('rate_dorm', dorm_id=dorm.id) }}" class="btn btn-primary right">Rate Dorm</a>
+            {% endif %}
+            
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>  
+
+
+
+  <!-- Latest ratings -->
+  <section>
+    <h2>Latest Ratings</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Dorm</th>
+          <th scope="col">Rating</th>
+          <th scope="col">Comment</th>
+          <th scope="col">User</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rating in latest_ratings %}
+        <tr>
+          <td>
+            <!-- Add the link to the dorm page here -->
+            <a href="{{ url_for('dorm_page', dorm_id=rating.dorm.id) }}">{{ rating.dorm.name }}</a>
+          </td>
+          <td>{{ rating.rating }}</td>
+          <td>{{ rating.comment }}</td>
+          <td>{{ rating.user.username }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <hr>
+
+  <!-- Navigation buttons -->
+  <section>
+    <div class="row">
+      <div class="col-md-6">
+        <a href="/ratings" class="btn btn-secondary btn-lg btn-block">View Your Ratings</a>
+      </div>
+      <div class="col-md-6">
+        <a href="{{ url_for('dorms') }}" class="btn btn-secondary btn-lg btn-block">View All Dorms</a>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
